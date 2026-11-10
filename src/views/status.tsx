@@ -1,4 +1,7 @@
+import type { NightCounts } from '../digest/counts.js';
 import type { Status } from '../status.js';
+
+const MISSING = '—';
 
 export function StatusBoard({ status }: { status: Status }) {
   return (
@@ -18,12 +21,26 @@ export function StatusBoard({ status }: { status: Status }) {
       {status.nights.length === 0 ? (
         <p class="mute">nothing in runs/</p>
       ) : (
-        <ul>
-          {status.nights.map((n) => (
-            <li>{n}</li>
-          ))}
-        </ul>
+        <table>
+          <thead>
+            <tr><th>night</th><th>ok</th><th>retry</th><th>fail</th></tr>
+          </thead>
+          <tbody>
+            {status.nights.map((n) => (
+              <tr>
+                <td><a href={`/digest/${n.night}`}>{n.night}</a></td>
+                <td>{countCell(n.counts, 'ok')}</td>
+                <td>{countCell(n.counts, 'retry')}</td>
+                <td>{countCell(n.counts, 'fail')}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       )}
     </>
   );
+}
+
+function countCell(counts: NightCounts | null, key: keyof NightCounts) {
+  return counts ? String(counts[key]) : MISSING;
 }
